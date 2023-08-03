@@ -19,11 +19,6 @@ body:
     validations:
       required: true
 
-  - type: input
-    id: reproduction
-    attributes:
-      label: Please provide a link to a minimal reproduction of the bug
-
   - type: textarea
     id: exception-or-error
     attributes:
@@ -33,7 +28,7 @@ body:
   - type: textarea
     id: environment
     attributes:
-      label: Please provide the environment you discovered this bug in (run `ng version`)
+      label: Please provide the environment you discovered this bug in
       render: true
 
   - type: textarea
