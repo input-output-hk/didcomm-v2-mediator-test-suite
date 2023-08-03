@@ -1,0 +1,29 @@
+name: 'Scenario Request'
+description: Suggest a new testing scenario for DIDComm V2 Mediator Test Suite
+
+body:
+  - type: textarea
+    id: proposed-protocol
+    attributes:
+      label: Proposed protocol
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-scenario
+    attributes:
+      label: Scenario name
+    validations:
+      required: true
+
+  - type: textarea
+    id: bdd-description
+    attributes:
+      label: Scenario BDD description
+    validations:
+      required: true
+
+  - type: textarea
+    id: other
+    attributes:
+      label: Anything else?
