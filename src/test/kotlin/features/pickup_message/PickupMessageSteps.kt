@@ -80,13 +80,13 @@ class PickupMessageSteps {
         )
     }
 
-    @Then("Mediator responds with a status message detailing the queued messages of {actor}")
-    fun mediatorRespondsWithAStatusMessageDetailingTheQueuedMessagesOfRecipient(recipient: Actor) {
+    @Then("Mediator responds with a status message with {int} queued messages of {actor}")
+    fun mediatorRespondsWithAStatusMessageDetailingTheQueuedMessagesOfRecipient(numberOfMessages: Int, recipient: Actor) {
         val didcommResponse = recipient.usingAbilityTo(CommunicateViaDidcomm::class.java).unpackLastDidcommMessage()
         val pickupStatus = Json.decodeFromString<MessagePickupStatusBody>(didcommResponse.body.toJSONString())
         recipient.attemptsTo(
             Ensure.that(pickupStatus.recipient_did).isEqualTo(recipient.recall("peerDid")),
-            Ensure.that(pickupStatus.message_count).isGreaterThan(0)
+            Ensure.that(pickupStatus.message_count).isEqualTo(numberOfMessages)
         )
     }
 
@@ -109,7 +109,7 @@ class PickupMessageSteps {
     @Then("Mediator delivers message of {actor} to {actor}")
     fun mediatorDeliversMessageOfSenderToRecipient(sender: Actor, recipient: Actor) {
         val didcommResponse = recipient.usingAbilityTo(CommunicateViaDidcomm::class.java).unpackLastDidcommMessage()
-        val encryptedMessage: Attachment.Data.Base64 = didcommResponse.attachments!!.first().data as Attachment.Data.Base64
+        val encryptedMessage = didcommResponse.attachments!!.first().data as Attachment.Data.Base64
         val decryptedMessage = Base64.getUrlDecoder().decode(encryptedMessage.base64).decodeToString()
         val achievedMessage = recipient.usingAbilityTo(CommunicateViaDidcomm::class.java).unpackMessage(decryptedMessage)
         val initialMessage = sender.recall<Message>("initialMessage")
@@ -119,6 +119,33 @@ class PickupMessageSteps {
             Ensure.that(achievedMessage.body.toJSONString()).isEqualTo(initialMessage.body.toJSONString()),
             Ensure.that(achievedMessage.from.toString()).isEqualTo(initialMessage.from.toString()),
             Ensure.that(achievedMessage.to!!.first()).isEqualTo(initialMessage.to!!.first())
+        )
+        recipient.remember("deliveryThid", didcommResponse.thid!!)
+        recipient.remember("attachmentId", didcommResponse.attachments!!.first().id)
+    }
+
+    @When("{actor} sends a messages-received message")
+    fun recipientSendsAMessagesReceivedMessage(recipient: Actor) {
+        val messagesReceivedMessage = Message.builder(
+            id = idGeneratorDefault(),
+            body = mapOf(
+                "message_id_list" to listOf(recipient.recall<String>("attachmentId"))
+            ),
+            type = DidcommMessageTypes.PICKUP_MESSAGES_RECEIVED
+        ).from(recipient.recall("peerDid"))
+            .to(listOf(MEDIATOR_PEER_DID))
+            .thid(recipient.recall<String>("deliveryThid"))
+            .build()
+        recipient.attemptsTo(
+            SendDidcommMessage(messagesReceivedMessage)
+        )
+    }
+
+    @Then("Mediator responds that there are no messages from {actor} to {actor}")
+    fun mediatorRespondsThatThereAreNoMessagesFrom(sender: Actor, recipient: Actor) {
+        val didcommResponse = recipient.usingAbilityTo(CommunicateViaDidcomm::class.java).unpackLastDidcommMessage()
+        recipient.attemptsTo(
+            Ensure.that(didcommResponse.attachments!!.size).isEqualTo(0),
         )
     }
 }
