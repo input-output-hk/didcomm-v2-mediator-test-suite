@@ -18,16 +18,16 @@ Feature: Pickup message protocol
 
     Given Sender sent a forward message to Recipient
     When Recipient sends a status-request message
-    Then Mediator responds with a status message detailing the queued messages of Recipient
+    Then Mediator responds with a status message with 1 queued messages of Recipient
 
-#  Scenario: Recipient sends a status-request message with no forward message available
-#
-#  Recipient asks mediator if any forward messages are available for him,
-#  Mediator should answer that there are no messages available for delivery.
-#
-#    When Recipient sends a status-request message
-#    Then Mediator responds with a status message detailing the queued messages of Recipient
-#
+  Scenario: Recipient sends a status-request message with no forward message available
+
+  Recipient asks mediator if any forward messages are available for him,
+  Mediator should answer that there are no messages available for delivery.
+
+    When Recipient sends a status-request message
+    Then Mediator responds with a status message with 0 queued messages of Recipient
+
   Scenario: Recipient sends a delivery-request message with one forward message available
 
   Recipient is trying to get one forward message from Mediator,
@@ -36,28 +36,27 @@ Feature: Pickup message protocol
     Given Sender sent a forward message to Recipient
     When Recipient sends a delivery-request message
     Then Mediator delivers message of Sender to Recipient
-#
-#  Scenario: Recipient sends a delivery-request message with no available forward messages
-#
-#  Recipient is trying to request delivery when no messages are available,
-#  Mediator should respond with a delivery response with no attachments.
-#
-#    When Recipient sends a delivery-request message
-#    Then Mediator responds that there are none messages from Sender to Recipient
-#
-#  Scenario: Recipient sends a delivery-request and confirms that messages were received
-#
-#  Recipient acknowledges and confirms that they received the message
-#  using `messages-received` message after which mediator should clear its messages queue for Recipient
-#  and respond with `status` message that should not contain any messages anymore.
-#
-#    Given Recipient sends a mediate request message to the mediator
-#    And Mediator responds to Recipient with mediate grant message
-#    And Sender sent a forward message to Recipient
-#    And Recipient sends a delivery-request message
-#    And Mediator delivers message of Sender to Recipient
-#    When Recipient sends a messages-received message
-#    Then Mediator responds with a status message with no messages available
+
+  Scenario: Recipient sends a delivery-request message with no available forward messages
+
+  Recipient is trying to request delivery when no messages are available,
+  Mediator should respond with a delivery response with no attachments.
+
+    When Recipient sends a delivery-request message
+    Then Mediator responds that there are no messages from Sender to Recipient
+
+  Scenario: Recipient sends a delivery-request and confirms that messages were received
+
+  Recipient acknowledges and confirms that they received the message
+  using `messages-received` message after which mediator should clear its messages queue for Recipient
+  and respond with `status` message that should not contain any messages anymore.
+
+    Given Sender sent a forward message to Recipient
+    And Recipient sends a delivery-request message
+    And Mediator delivers message of Sender to Recipient
+    When Recipient sends a messages-received message
+    When Recipient sends a status-request message
+    Then Mediator responds with a status message with 0 queued messages of Recipient
 #
 #  Scenario Outline: Recipient limits number of messages for delivery
 #
