@@ -49,5 +49,4 @@ object Ensure {
 
     fun enableSoftAssertions() = EnableSoftAssertions()
     fun reportSoftAssertions() = ReportSoftAssertions()
-
 }

@@ -5,48 +5,48 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class MediationResponse(
     val routing_did: String
-): JsonEncoded
+) : JsonEncoded
 
 @Serializable
 data class MediationKeylistRequest(
     val updates: List<MediationKeylistRequestMessage>
-): JsonEncoded
+) : JsonEncoded
 
 @Serializable
 data class MediationKeylistUpdateResponse(
     val updated: List<MediationKeylistResponseMessage>
-): JsonEncoded
+) : JsonEncoded
 
 @Serializable
 data class MediationKeylistResponse(
     val keys: List<MediationKeylistKey>
-): JsonEncoded
+) : JsonEncoded
 
 @Serializable
 data class MediationKeylistKey(
     val recipient_did: String
-): JsonEncoded
+) : JsonEncoded
 
 @Serializable
 data class MediationKeylistRequestMessage(
     val action: String,
     val recipient_did: String
-): JsonEncoded
+) : JsonEncoded
 
 @Serializable
 data class MediationKeylistResponseMessage(
     val result: String,
     val action: String,
     val recipient_did: String
-): JsonEncoded
+) : JsonEncoded
 
 @Serializable
 data class MediationKeylistQueryRequest(
     val paginate: Paginate
-): JsonEncoded
+) : JsonEncoded
 
 @Serializable
 data class Paginate(
     val limit: Int,
     val offset: Int
-): JsonEncoded
+) : JsonEncoded

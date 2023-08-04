@@ -7,7 +7,7 @@ data class MessagePickupStatus(
     val id: String,
     val type: String,
     val body: MessagePickupStatusBody
-): JsonEncoded
+) : JsonEncoded
 
 @Serializable
 data class MessagePickupStatusBody(
@@ -18,4 +18,4 @@ data class MessagePickupStatusBody(
     val oldest_received_time: Int = 0,
     val total_bytes: Int = 0,
     val live_delivery: Boolean = false
-): JsonEncoded
+) : JsonEncoded

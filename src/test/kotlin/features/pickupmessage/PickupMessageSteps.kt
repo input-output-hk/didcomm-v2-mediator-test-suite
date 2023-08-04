@@ -1,18 +1,16 @@
-package features.pickup_message
+package features.pickupmessage
 
 import abilities.CommunicateViaDidcomm
 import common.*
-import common.Environments.MEDIATOR_PEER_DID
-import interactions.SendEncryptedDidcommMessage
 import interactions.SendDidcommMessage
+import interactions.SendEncryptedDidcommMessage
 import io.cucumber.java.en.Given
-import net.serenitybdd.screenplay.Actor
-import io.cucumber.java.en.When
 import io.cucumber.java.en.Then
+import io.cucumber.java.en.When
 import io.ktor.http.*
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import models.MessagePickupStatusBody
+import net.serenitybdd.screenplay.Actor
 import org.didcommx.didcomm.message.Attachment
 import org.didcommx.didcomm.message.Message
 import org.didcommx.didcomm.utils.idGeneratorDefault
@@ -23,7 +21,6 @@ class PickupMessageSteps {
 
     @Given("{actor} sent a forward message to {actor}")
     fun senderSentAForwardMessageToRecipient(sender: Actor, recipient: Actor) {
-
         val basicMessage = Message.builder(
             id = idGeneratorDefault(),
             body = mapOf("basic" to "message"),
@@ -31,49 +28,24 @@ class PickupMessageSteps {
         ).from(sender.recall("peerDid"))
             .to(listOf(recipient.recall("peerDid"))).build()
 
-        // Native forward message creation
-//        val packedBasic = sender.usingAbilityTo(CommunicateViaDidcomm::class.java).packMessage(
-//            basicMessage, recipient.recall("peerDid")
-//        )
-//        val forwardMessage = Message.builder(
-//            id = UUID.randomUUID().toString(),
-//            body = mapOf("next" to recipient.recall("peerDid")),
-//            type = DidcommMessageTypes.FORWARD_REQUEST,
-//        ).from(sender.recall("peerDid"))
-//            .to(listOf(MEDIATOR_PEER_DID))
-//            .attachments(
-//                listOf(
-//                    Attachment.builder(
-//                        didcommIdGeneratorDefault(), Attachment.Data.Json(JSONObjectUtils.parse(packedBasic))
-//                    ).mediaType(ContentType.Application.Json.toString()).build()
-//                )
-//            ).build()
-//        sender.attemptsTo(
-//            SendPlainDidcommMessage(forwardMessage)
-//        )
-
         val wrapInForwardResult = sender.usingAbilityTo(CommunicateViaDidcomm::class.java).wrapInForward(
             basicMessage,
-            recipient.recall("peerDid"),
-            routingKeys = listOf(MEDIATOR_PEER_DID)
+            recipient.recall("peerDid")
         )
         sender.attemptsTo(
             SendEncryptedDidcommMessage(wrapInForwardResult.msgEncrypted.packedMessage)
         )
 
         sender.remember("initialMessage", basicMessage)
-
     }
 
     @When("{actor} sends a status-request message")
     fun recipientSendsAStatusRequestMessage(recipient: Actor) {
-
         val statusRequestMessage = Message.builder(
             id = idGeneratorDefault(),
             body = mapOf("recipient_did" to recipient.recall("peerDid")),
             type = DidcommMessageTypes.PICKUP_STATUS_REQUEST
-        ).from(recipient.recall("peerDid"))
-            .to(listOf(MEDIATOR_PEER_DID)).build()
+        )
 
         recipient.attemptsTo(
             SendDidcommMessage(statusRequestMessage)
@@ -99,8 +71,7 @@ class PickupMessageSteps {
                 "limit" to 3
             ),
             type = DidcommMessageTypes.PICKUP_DELIVERY_REQUEST
-        ).from(recipient.recall("peerDid"))
-            .to(listOf(MEDIATOR_PEER_DID)).build()
+        )
         recipient.attemptsTo(
             SendDidcommMessage(deliveryRequestMessage)
         )
@@ -114,6 +85,7 @@ class PickupMessageSteps {
         val achievedMessage = recipient.usingAbilityTo(CommunicateViaDidcomm::class.java).unpackMessage(decryptedMessage)
         val initialMessage = sender.recall<Message>("initialMessage")
         recipient.attemptsTo(
+            Ensure.that(didcommResponse.type).isEqualTo(DidcommMessageTypes.PICKUP_DELIVERY),
             Ensure.that(didcommResponse.attachments!!.size).isEqualTo(1),
             Ensure.that(achievedMessage.id).isEqualTo(initialMessage.id),
             Ensure.that(achievedMessage.body.toJSONString()).isEqualTo(initialMessage.body.toJSONString()),
@@ -132,10 +104,8 @@ class PickupMessageSteps {
                 "message_id_list" to listOf(recipient.recall<String>("attachmentId"))
             ),
             type = DidcommMessageTypes.PICKUP_MESSAGES_RECEIVED
-        ).from(recipient.recall("peerDid"))
-            .to(listOf(MEDIATOR_PEER_DID))
-            .thid(recipient.recall<String>("deliveryThid"))
-            .build()
+        ).thid(recipient.recall<String>("deliveryThid"))
+
         recipient.attemptsTo(
             SendDidcommMessage(messagesReceivedMessage)
         )
@@ -145,7 +115,8 @@ class PickupMessageSteps {
     fun mediatorRespondsThatThereAreNoMessagesFrom(sender: Actor, recipient: Actor) {
         val didcommResponse = recipient.usingAbilityTo(CommunicateViaDidcomm::class.java).unpackLastDidcommMessage()
         recipient.attemptsTo(
-            Ensure.that(didcommResponse.attachments!!.size).isEqualTo(0),
+            Ensure.that(didcommResponse.type).isEqualTo(DidcommMessageTypes.PICKUP_STATUS),
+            Ensure.that(didcommResponse.attachments!!.size).isEqualTo(0)
         )
     }
 }
