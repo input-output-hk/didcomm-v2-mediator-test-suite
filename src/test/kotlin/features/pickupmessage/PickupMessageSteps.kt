@@ -111,8 +111,8 @@ class PickupMessageSteps {
         )
     }
 
-    @Then("Mediator responds that there are no messages from {actor} to {actor}")
-    fun mediatorRespondsThatThereAreNoMessagesFrom(sender: Actor, recipient: Actor) {
+    @Then("Mediator responds that there are no messages for {actor}")
+    fun mediatorRespondsThatThereAreNoMessagesFrom(recipient: Actor) {
         val didcommResponse = recipient.usingAbilityTo(CommunicateViaDidcomm::class.java).unpackLastDidcommMessage()
         recipient.attemptsTo(
             Ensure.that(didcommResponse.type).isEqualTo(DidcommMessageTypes.PICKUP_STATUS),
