@@ -11,7 +11,7 @@ import net.serenitybdd.screenplay.rest.interactions.Post
 open class SendEncryptedDidcommMessage(
     private val message: String,
     private val contentType: String = TestConstants.DIDCOMM_V2_CONTENT_TYPE_ENCRYPTED
-): Interaction {
+) : Interaction {
     override fun <T : Actor> performAs(actor: T) {
         // We have to rewrite spec to remove all unnecessary hardcoded headers
         // from standard serenity rest interaction
@@ -19,10 +19,11 @@ open class SendEncryptedDidcommMessage(
             .setContentType(contentType)
             .setConfig(
                 RestAssured.config()
-                .encoderConfig(
-                    EncoderConfig
-                        .encoderConfig()
-                        .appendDefaultContentCharsetToContentTypeIfUndefined(false))
+                    .encoderConfig(
+                        EncoderConfig
+                            .encoderConfig()
+                            .appendDefaultContentCharsetToContentTypeIfUndefined(false)
+                    )
             )
             .setBody(message)
             .build()

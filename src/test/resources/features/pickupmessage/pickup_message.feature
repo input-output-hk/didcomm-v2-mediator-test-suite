@@ -43,7 +43,7 @@ Feature: Pickup message protocol
   Mediator should respond with a delivery response with no attachments.
 
     When Recipient sends a delivery-request message
-    Then Mediator responds that there are no messages from Sender to Recipient
+    Then Mediator responds with a status message with 0 queued messages of Recipient
 
   Scenario: Recipient sends a delivery-request and confirms that messages were received
 

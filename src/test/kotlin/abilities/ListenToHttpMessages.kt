@@ -11,11 +11,10 @@ import net.serenitybdd.screenplay.Ability
 import net.serenitybdd.screenplay.Actor
 import net.serenitybdd.screenplay.HasTeardown
 
-
 open class ListenToHttpMessages(
     private val host: String,
-    private val port: Int,
-): Ability, HasTeardown {
+    private val port: Int
+) : Ability, HasTeardown {
 
     private val server: ApplicationEngine
     private var receivedResponse: String? = null
@@ -25,7 +24,8 @@ open class ListenToHttpMessages(
             Netty,
             host = "0.0.0.0",
             port = port,
-            module = {route(this)})
+            module = { route(this) }
+        )
             .start(wait = false)
     }
 
@@ -48,13 +48,12 @@ open class ListenToHttpMessages(
         }
     }
 
-
     fun receivedResponse(): String? {
         return receivedResponse
     }
 
     override fun toString(): String {
-        return "Listen HTTP port at ${host}:${port}"
+        return "Listen HTTP port at $host:$port"
     }
 
     override fun tearDown() {

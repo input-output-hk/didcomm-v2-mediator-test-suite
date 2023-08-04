@@ -7,25 +7,30 @@ import org.didcommx.didcomm.common.VerificationMethodType
 import org.didcommx.didcomm.diddoc.DIDDocResolver
 import org.didcommx.didcomm.secret.Secret
 import org.didcommx.didcomm.secret.SecretResolverInMemory
+import org.didcommx.didcomm.utils.fromMulticodec
 import org.didcommx.peerdid.VerificationMaterialFormatPeerDID
 import org.didcommx.peerdid.VerificationMaterialPeerDID
 import org.didcommx.peerdid.VerificationMethodTypePeerDID
-import org.didcommx.peerdid.core.*
+import org.didcommx.peerdid.core.fromBase58
+import org.didcommx.peerdid.core.fromBase58Multibase
+import org.didcommx.peerdid.core.fromJwk
+import org.didcommx.peerdid.core.toBase58Multibase
+import org.didcommx.peerdid.core.toMulticodec
 
 class PeerDID(
     val did: String,
     val jwkForKeyAgreement: List<OctetKeyPair>,
-    val jwkForKeyAuthentication: List<OctetKeyPair>,
+    val jwkForKeyAuthentication: List<OctetKeyPair>
 ) {
     val didDocument: String
         get() = org.didcommx.peerdid.resolvePeerDID(did, VerificationMaterialFormatPeerDID.JWK)
 
     fun getSecretResolverInMemory(): SecretResolverInMemory {
-
         fun validateRawKeyLength(key: ByteArray) {
             // for all supported key types now (ED25519 and X25510) the expected size is 32
-            if (key.size != 32)
+            if (key.size != 32) {
                 throw IllegalArgumentException("Invalid key $key")
+            }
         }
 
         fun createMultibaseEncnumbasis(key: VerificationMaterialPeerDID<out VerificationMethodTypePeerDID>): String {
@@ -60,7 +65,7 @@ class PeerDID(
         return SecretResolverInMemory(
             mapOf(
                 "${this.did}#$keyIdAgreement" to secretKeyAgreement,
-                "${this.did}#$keyIdAuthentication" to secretKeyAuthentication,
+                "${this.did}#$keyIdAuthentication" to secretKeyAuthentication
             )
         )
     }

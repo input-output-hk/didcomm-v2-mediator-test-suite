@@ -1,9 +1,9 @@
 plugins {
-    kotlin("jvm") version "1.8.21"
-    kotlin("plugin.serialization") version "1.8.21"
+    id("org.jetbrains.kotlin.jvm") version "1.9.0"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.0"
     idea
-    jacoco
-    id("net.serenity-bdd.serenity-gradle-plugin") version "3.4.2"
+    id("net.serenity-bdd.serenity-gradle-plugin") version "3.9.8"
+    id("org.jlleitschuh.gradle.ktlint") version "11.5.0"
 }
 
 group = "didcommv2.mediator.tests"
@@ -20,35 +20,29 @@ repositories {
 dependencies {
     // Logging
     implementation("org.slf4j:slf4j-log4j12:2.0.5")
-    // Beautify async waits
-    implementation("org.awaitility:awaitility-kotlin:4.2.0")
     // Test engines and reports
     testImplementation("junit:junit:4.13.2")
-    implementation("net.serenity-bdd:serenity-core:3.4.3")
-    implementation("net.serenity-bdd:serenity-cucumber:3.4.3")
-    implementation("net.serenity-bdd:serenity-screenplay-rest:3.4.3")
-    // https://mvnrepository.com/artifact/net.serenity-bdd/serenity-ensure
-    testImplementation("net.serenity-bdd:serenity-ensure:3.4.3")
-    // Beautify exceptions handling assertions
-    testImplementation("org.assertj:assertj-core:3.23.1")
-    // Navigate through Json with xpath
-    testImplementation("com.jayway.jsonpath:json-path:2.7.0")
+    implementation("net.serenity-bdd:serenity-core:3.9.8")
+    implementation("net.serenity-bdd:serenity-cucumber:3.9.8")
+    implementation("net.serenity-bdd:serenity-screenplay-rest:3.9.8")
+    testImplementation("net.serenity-bdd:serenity-ensure:3.9.8")
+    // DIDComm
     implementation("org.didcommx:didcomm:0.3.0")
     implementation("org.didcommx:peerdid:0.3.0")
-    implementation("io.ktor:ktor-server-netty:2.3.0")
-    implementation("io.ktor:ktor-client-apache:2.3.0")
-
-    // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
-    implementation("com.squareup.okhttp3:okhttp:4.11.0")
-
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
-
+    // Ktor for HTTP listener
+    implementation("io.ktor:ktor-server-netty:2.3.3")
+    implementation("io.ktor:ktor-client-apache:2.3.3")
+    // JSON serialization
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+    // Hoplite for configuration
+    implementation("com.sksamuel.hoplite:hoplite-core:2.7.4")
+    implementation("com.sksamuel.hoplite:hoplite-hocon:2.7.4")
 }
 
 buildscript {
     dependencies {
-        classpath("net.serenity-bdd:serenity-single-page-report:3.4.3")
-        classpath("net.serenity-bdd:serenity-json-summary-report:3.4.3")
+        classpath("net.serenity-bdd:serenity-single-page-report:3.9.8")
+        classpath("net.serenity-bdd:serenity-json-summary-report:3.9.8")
     }
 }
 
@@ -65,5 +59,9 @@ tasks.test {
 }
 
 kotlin {
-    jvmToolchain(11)
+    jvmToolchain(19)
+}
+
+ktlint {
+    disabledRules.set(setOf("no-wildcard-imports"))
 }
