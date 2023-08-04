@@ -17,6 +17,7 @@ For the full list of scenarios and their description, please, refer to [features
 
 ## Compatible mediators
 
+The following mediators are compatible with DIDComm V2 and tested with this test suite:
 | Mediator                                                                  | Trust ping         | Mediator coordination 2.0 | Pickup 3.0         |
 |---------------------------------------------------------------------------|--------------------|---------------------------|--------------------|
 | [PRISM Mediator](https://github.com/input-output-hk/atala-prism-mediator) | :white_check_mark: | :white_check_mark:        | :white_check_mark: |
@@ -26,10 +27,35 @@ For the full list of scenarios and their description, please, refer to [features
 
 ## Configuration
 
-`MEDIATOR_URL` - URL of the mediator
-`MEDIATOR_PEER_DID` - Peer DID of the mediator
-`RECIPIENT_LISTENER_HOST` - Host of the recipient listener, for async messages
-`RECIPIENT_LISTENER_PORT` - Port of the recipient listener, for async messages
+To run the test suite, it is required to configure mediator and recipient endpoints.
+
+The configuration file is placed at `src/test/resources/mediator.conf`:
+
+```text
+mediator {
+    url = "http://localhost:8080"
+    url = ${?MEDIATOR_URL}
+    did = ${?MEDIATOR_DID}
+    invitation_endpoint = "/invitation"
+    invitation_endpoint = ${?INVITATION_ENDPOINT}
+}
+
+recipient {
+    host = "host.docker.internal"
+    host = ${?RECIPIENT_HOST}
+    port = 9999
+    port = ${?RECIPIENT_PORT}
+}
+```
+
+Some things to consider:
+
+1. `recipient.host` is set to `host.docker.internal` by default to allow running tests VS the Docker containers.
+You could change this to `localhost` if you're working with the mediator and recipient available at the host network.
+2. `recipient.port` is set to `9999` by default to avoid conflicts with other services running on the host machine.
+3. `mediator.url` is set to `http://localhost:8080` by default, please, change it to the actual mediator URL.
+4. `mediator.did` is optional parameter. If not set, then the test suite will try to use `mediator.invitation_endpoint`
+to set to `mediator.did` if it is not explicitly set.
 
 ## Tools
 
@@ -118,3 +144,7 @@ This project can be integrated in GitHub actions workflow with the following sni
 ## Contributing to project
 
 Please, refer to [CONTRIBUTING.md](./CONTRIBUTING.md) file.
+
+## License
+
+This project is licensed under the terms of the [Apache License 2.0](./LICENSE).
