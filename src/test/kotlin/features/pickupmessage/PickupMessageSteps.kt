@@ -66,7 +66,7 @@ class PickupMessageSteps {
                 Ensure.that(pickupStatus.recipient_did).isEqualTo(recipient.recall<PeerDID>("communicationPeerDidService").did),
                 Ensure.that(pickupStatus.message_count).isEqualTo(numberOfMessages)
             )
-        } catch(_: MissingFieldException) {
+        } catch (_: MissingFieldException) {
             recipient.attemptsTo(
                 Ensure.that(didcommResponse.type).isEqualTo(DidcommMessageTypes.PICKUP_DELIVERY),
                 Ensure.that(didcommResponse.attachments!!.size).isEqualTo(0)
