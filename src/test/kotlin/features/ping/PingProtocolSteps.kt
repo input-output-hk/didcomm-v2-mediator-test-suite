@@ -21,10 +21,10 @@ class PingProtocolSteps {
             id = idGeneratorDefault(),
             body = mapOf("response_requested" to true),
             type = DidcommMessageTypes.PING_REQUEST
-        ).customHeader("return_route", returnRoute)
+        )
 
         recipient.attemptsTo(
-            SendDidcommMessage(messageTrustPing)
+            SendDidcommMessage(messageTrustPing, returnRoute = returnRoute)
         )
     }
 
@@ -46,6 +46,21 @@ class PingProtocolSteps {
             Ensure.that(SerenityRest.lastResponse().statusCode).isEqualTo(SC_OK),
             Ensure.that(didCommResponseMessage.type).isEqualTo(DidcommMessageTypes.PING_RESPONSE),
             Ensure.that(didCommResponseMessage.to!!.first()).isEqualTo(recipient.recall("peerDid"))
+        )
+    }
+
+    @Then("{actor} receives no async message back")
+    fun recipientReceivesNoAsyncMessageBack(recipient: Actor) {
+        val didCommResponse: String? = recipient.usingAbilityTo(ListenToHttpMessages::class.java).receivedResponse()
+        recipient.attemptsTo(
+            Ensure.that(didCommResponse).isNull()
+        )
+    }
+
+    @Then("{actor} receives no sync message back")
+    fun recipientReceivesNoSyncMessageBack(recipient: Actor) {
+        recipient.attemptsTo(
+            Ensure.that(SerenityRest.lastResponse().body.print()).isEmpty()
         )
     }
 }

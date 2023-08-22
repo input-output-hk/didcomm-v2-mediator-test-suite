@@ -13,7 +13,7 @@ import net.serenitybdd.screenplay.ensure.thatTheListOf as ThatTheListOf
 import net.serenitybdd.screenplay.targets.Target as SerenityTarget
 
 object Ensure {
-    fun that(value: String) = That(value)
+    fun that(value: String?) = That(value)
     fun that(value: LocalDate) = That(value)
     fun that(value: LocalTime) = That(value)
     fun that(value: Boolean) = That(value)

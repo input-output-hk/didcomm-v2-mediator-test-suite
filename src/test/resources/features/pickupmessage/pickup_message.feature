@@ -10,6 +10,7 @@ Feature: Pickup message protocol
   Background: Recipient and Mediator successfully set up mediation
     Given Recipient sends a mediate request message to the mediator
     And Mediator responds to Recipient with mediate grant message
+    And Recipient sends a keylist update message to the mediator with a new peer did
 
   Scenario: Recipient sends a status-request message with one forward message available
 

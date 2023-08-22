@@ -13,12 +13,14 @@ import org.didcommx.didcomm.message.MessageBuilder
 
 open class SendDidcommMessage(
     private val messageBuilder: MessageBuilder,
-    private val contentType: String = TestConstants.DIDCOMM_V2_CONTENT_TYPE_ENCRYPTED
+    private val contentType: String = TestConstants.DIDCOMM_V2_CONTENT_TYPE_ENCRYPTED,
+    private val returnRoute: String = "all"
 ) : Interaction {
     override fun <T : Actor> performAs(actor: T) {
         val message = messageBuilder
             .from(actor.recall("peerDid"))
             .to(listOf(actor.usingAbilityTo(CommunicateViaDidcomm::class.java).mediatorPeerDid))
+            .customHeader("return_route", returnRoute)
             .build()
         Serenity.recordReportData().withTitle("DIDComm Message").andContents(message.toString())
         // We have to rewrite spec to remove all unnecessary hardcoded headers

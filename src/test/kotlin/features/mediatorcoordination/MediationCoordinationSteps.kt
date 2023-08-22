@@ -35,7 +35,7 @@ class MediationCoordinationSteps {
             Ensure.that(didcommResponse.type).isEqualTo(DidcommMessageTypes.MEDIATE_GRANT),
             Ensure.that(mediationResponse.routing_did).isNotEmpty()
         )
-        recipient.usingAbilityTo(CommunicateViaDidcomm::class.java).mediatorPeerDid = mediationResponse.routing_did
+        recipient.remember("routingDid", mediationResponse.routing_did)
     }
 
     @Then("Mediator responds to {actor} with mediate deny message")
@@ -50,18 +50,20 @@ class MediationCoordinationSteps {
 
     @When("{actor} sends a keylist update message to the mediator with a new peer did")
     fun recipientSendsAKeylistUpdateMessageToTheMediatorWithANewPeerDid(recipient: Actor) {
-        val newPeerDid = recipient.usingAbilityTo(CommunicateViaDidcomm::class.java).createNewPeerDid()
-        recipient.attemptsTo(
-            Ensure.that(newPeerDid).isNotEqualTo(recipient.recall("peerDid"))
+        val communicationPeerDidService = recipient.usingAbilityTo(CommunicateViaDidcomm::class.java).createNewPeerDidService(
+            recipient.recall("routingDid")
         )
-        recipient.remember("newPeerDid", newPeerDid)
+        recipient.attemptsTo(
+            Ensure.that(communicationPeerDidService.did).isNotEqualTo(recipient.recall("peerDid"))
+        )
+        recipient.remember("communicationPeerDidService", communicationPeerDidService)
         val messageKeylistUpdate = Message.builder(
             id = idGeneratorDefault(),
             body = mapOf(
                 "updates" to listOf(
                     mapOf(
                         "action" to TestConstants.MEDIATOR_COORDINATION_ACTION_ADD,
-                        "recipient_did" to newPeerDid
+                        "recipient_did" to communicationPeerDidService.did
                     )
                 )
             ),
@@ -81,7 +83,7 @@ class MediationCoordinationSteps {
             Ensure.that(mediationKeylistUpdateResponse.updated.size).isEqualTo(1),
             Ensure.that(mediationKeylistUpdateResponse.updated[0].result).isEqualTo(TestConstants.MEDIATOR_COORDINATION_ACTION_RESULT_SUCCESS),
             Ensure.that(mediationKeylistUpdateResponse.updated[0].action).isEqualTo(TestConstants.MEDIATOR_COORDINATION_ACTION_ADD),
-            Ensure.that(mediationKeylistUpdateResponse.updated[0].recipient_did).isEqualTo(recipient.recall("newPeerDid"))
+            Ensure.that(mediationKeylistUpdateResponse.updated[0].recipient_did).isEqualTo(recipient.recall<PeerDID>("communicationPeerDidService").did)
         )
     }
 
@@ -92,7 +94,7 @@ class MediationCoordinationSteps {
             body = mapOf(
                 "paginate" to
                     mapOf(
-                        "limit" to 1,
+                        "limit" to 2,
                         "offset" to 0
                     )
             ),
@@ -110,7 +112,7 @@ class MediationCoordinationSteps {
         recipient.attemptsTo(
             Ensure.that(didcommResponse.type).isEqualTo(DidcommMessageTypes.MEDIATE_KEYLIST),
             Ensure.that(mediationKeylistResponse.keys.size).isGreaterThan(0),
-            Ensure.that(mediationKeylistResponse.keys.last().recipient_did).isEqualTo(recipient.recall("peerDid"))
+            Ensure.that(mediationKeylistResponse.keys).contains(MediationKeylistKey(recipient.recall<PeerDID>("communicationPeerDidService").did))
         )
     }
 
@@ -141,7 +143,7 @@ class MediationCoordinationSteps {
                 "updates" to listOf(
                     mapOf(
                         "action" to TestConstants.MEDIATOR_COORDINATION_ACTION_REMOVE,
-                        "recipient_did" to recipient.recall("newPeerDid")
+                        "recipient_did" to recipient.recall<PeerDID>("communicationPeerDidService").did
                     )
                 )
             ),
