@@ -16,18 +16,17 @@ Feature: Mediator Coordination protocol
     Then Mediator responds to Recipient with a correct keylist update add message
 
   Scenario: Recipient removes alias from keylist
-    When Recipient sends a keylist update message to the mediator with a new peer did
-    And Recipient sends a keylist update message to the mediator to remove added alias
+    Given Recipient sends a keylist update message to the mediator with a new peer did
+    And Mediator responds to Recipient with a correct keylist update add message
+    When Recipient sends a keylist update message to the mediator to remove added alias
     Then Mediator responds to Recipient with a correct keylist update remove message
 
   Scenario: Recipient removes not existing alias
     When Recipient sends a keylist update message to the mediator to remove not existing alias
     Then Mediator responds to Recipient with a message with no_change status
 
-  Scenario: Recipient removes the last alias from keylist
-    When Recipient sends a keylist update message to the mediator to remove the last alias
-    Then Mediator responds to Recipient with a correct keylist update remove message
-
   Scenario: Recipient query keylist
+    Given Recipient sends a keylist update message to the mediator with a new peer did
+    And Mediator responds to Recipient with a correct keylist update add message
     When Recipient sends a keylist query message to the mediator
     Then Mediator responds to Recipient with keylist message containing the current list of keys

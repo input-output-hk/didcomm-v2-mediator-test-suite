@@ -2,6 +2,7 @@ package abilities
 
 import models.AgentPeerService
 import models.DIDDocResolverPeerDID
+import models.PeerDID
 import net.serenitybdd.core.Serenity
 import net.serenitybdd.rest.SerenityRest
 import net.serenitybdd.screenplay.Ability
@@ -12,6 +13,7 @@ import org.didcommx.didcomm.model.PackEncryptedParams
 import org.didcommx.didcomm.model.UnpackParams
 import org.didcommx.didcomm.protocols.routing.Routing
 import org.didcommx.didcomm.protocols.routing.WrapInForwardResult
+import org.didcommx.didcomm.secret.SecretResolver
 import org.didcommx.didcomm.utils.fromJsonToMap
 
 open class CommunicateViaDidcomm(var mediatorPeerDid: String, serviceEndpoint: String = "") : Ability {
@@ -33,7 +35,8 @@ open class CommunicateViaDidcomm(var mediatorPeerDid: String, serviceEndpoint: S
 
     fun getDid(): String = peerDidService.did
 
-    fun createNewPeerDid(): String = AgentPeerService.makePeerDid().did
+    fun createNewPeerDidService(serviceEndpoint: String = ""): PeerDID =
+        AgentPeerService.makePeerDid(serviceEndpoint = serviceEndpoint)
 
     fun packMessage(message: Message, to: String = mediatorPeerDid): String =
         didComm.packEncrypted(
@@ -47,18 +50,18 @@ open class CommunicateViaDidcomm(var mediatorPeerDid: String, serviceEndpoint: S
         val packedMessage = packMessage(message, to)
         return routing.wrapInForward(fromJsonToMap(packedMessage), to, routingKeys = listOf(mediatorPeerDid))!!
     }
-    fun unpackMessage(message: String): Message = didComm.unpack(
+    fun unpackMessage(message: String, secretResolver: SecretResolver? = null): Message = didComm.unpack(
         UnpackParams(
             packedMessage = message,
             didDocResolver = didDocResolver,
-            secretResolver = peerDidService.getSecretResolverInMemory(),
+            secretResolver = secretResolver ?: peerDidService.getSecretResolverInMemory(),
             expectDecryptByAllKeys = false,
             unwrapReWrappingForward = false
         )
     ).message
 
-    fun unpackLastDidcommMessage(): Message {
-        val didcommMessage = unpackMessage(SerenityRest.lastResponse().asString())
+    fun unpackLastDidcommMessage(secretResolver: SecretResolver? = null): Message {
+        val didcommMessage = unpackMessage(SerenityRest.lastResponse().asString(), secretResolver)
         Serenity.recordReportData().withTitle("DIDComm Response").andContents(didcommMessage.toString())
         return didcommMessage
     }

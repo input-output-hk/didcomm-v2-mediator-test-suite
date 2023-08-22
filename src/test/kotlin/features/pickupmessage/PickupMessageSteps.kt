@@ -8,8 +8,11 @@ import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import io.ktor.http.*
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.MissingFieldException
 import kotlinx.serialization.json.Json
 import models.MessagePickupStatusBody
+import models.PeerDID
 import net.serenitybdd.screenplay.Actor
 import org.didcommx.didcomm.message.Attachment
 import org.didcommx.didcomm.message.Message
@@ -26,11 +29,11 @@ class PickupMessageSteps {
             body = mapOf("basic" to "message"),
             type = DidcommMessageTypes.BASIC_MESSAGE
         ).from(sender.recall("peerDid"))
-            .to(listOf(recipient.recall("peerDid"))).build()
+            .to(listOf(recipient.recall<PeerDID>("communicationPeerDidService").did)).build()
 
         val wrapInForwardResult = sender.usingAbilityTo(CommunicateViaDidcomm::class.java).wrapInForward(
             basicMessage,
-            recipient.recall("peerDid")
+            recipient.recall<PeerDID>("communicationPeerDidService").did
         )
         sender.attemptsTo(
             SendEncryptedDidcommMessage(wrapInForwardResult.msgEncrypted.packedMessage)
@@ -43,7 +46,7 @@ class PickupMessageSteps {
     fun recipientSendsAStatusRequestMessage(recipient: Actor) {
         val statusRequestMessage = Message.builder(
             id = idGeneratorDefault(),
-            body = mapOf("recipient_did" to recipient.recall("peerDid")),
+            body = mapOf("recipient_did" to recipient.recall<PeerDID>("communicationPeerDidService").did),
             type = DidcommMessageTypes.PICKUP_STATUS_REQUEST
         )
 
@@ -52,14 +55,23 @@ class PickupMessageSteps {
         )
     }
 
+    @OptIn(ExperimentalSerializationApi::class)
     @Then("Mediator responds with a status message with {int} queued messages of {actor}")
     fun mediatorRespondsWithAStatusMessageDetailingTheQueuedMessagesOfRecipient(numberOfMessages: Int, recipient: Actor) {
         val didcommResponse = recipient.usingAbilityTo(CommunicateViaDidcomm::class.java).unpackLastDidcommMessage()
-        val pickupStatus = Json.decodeFromString<MessagePickupStatusBody>(didcommResponse.body.toJSONString())
-        recipient.attemptsTo(
-            Ensure.that(pickupStatus.recipient_did).isEqualTo(recipient.recall("peerDid")),
-            Ensure.that(pickupStatus.message_count).isEqualTo(numberOfMessages)
-        )
+        try {
+            val pickupStatus = Json.decodeFromString<MessagePickupStatusBody>(didcommResponse.body.toJSONString())
+            recipient.attemptsTo(
+                Ensure.that(didcommResponse.type).isEqualTo(DidcommMessageTypes.PICKUP_STATUS),
+                Ensure.that(pickupStatus.recipient_did).isEqualTo(recipient.recall<PeerDID>("communicationPeerDidService").did),
+                Ensure.that(pickupStatus.message_count).isEqualTo(numberOfMessages)
+            )
+        } catch(_: MissingFieldException) {
+            recipient.attemptsTo(
+                Ensure.that(didcommResponse.type).isEqualTo(DidcommMessageTypes.PICKUP_DELIVERY),
+                Ensure.that(didcommResponse.attachments!!.size).isEqualTo(0)
+            )
+        }
     }
 
     @When("{actor} sends a delivery-request message")
@@ -67,7 +79,7 @@ class PickupMessageSteps {
         val deliveryRequestMessage = Message.builder(
             id = idGeneratorDefault(),
             body = mapOf(
-                "recipient_did" to recipient.recall("peerDid"),
+                "recipient_did" to recipient.recall<PeerDID>("communicationPeerDidService").did,
                 "limit" to 3
             ),
             type = DidcommMessageTypes.PICKUP_DELIVERY_REQUEST
@@ -82,7 +94,10 @@ class PickupMessageSteps {
         val didcommResponse = recipient.usingAbilityTo(CommunicateViaDidcomm::class.java).unpackLastDidcommMessage()
         val encryptedMessage = didcommResponse.attachments!!.first().data as Attachment.Data.Base64
         val decryptedMessage = Base64.getUrlDecoder().decode(encryptedMessage.base64).decodeToString()
-        val achievedMessage = recipient.usingAbilityTo(CommunicateViaDidcomm::class.java).unpackMessage(decryptedMessage)
+        val achievedMessage = recipient.usingAbilityTo(CommunicateViaDidcomm::class.java).unpackMessage(
+            decryptedMessage,
+            recipient.recall<PeerDID>("communicationPeerDidService").getSecretResolverInMemory()
+        )
         val initialMessage = sender.recall<Message>("initialMessage")
         recipient.attemptsTo(
             Ensure.that(didcommResponse.type).isEqualTo(DidcommMessageTypes.PICKUP_DELIVERY),

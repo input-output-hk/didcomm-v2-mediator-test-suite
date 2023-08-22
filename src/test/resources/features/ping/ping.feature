@@ -7,7 +7,9 @@ Feature: Trust Ping Protocol
   Scenario: Recipient sends and receives trusted ping message with return_route "all"
     When Recipient sends trusted ping message to mediator with return_route "all"
     Then Recipient receives trusted ping message back synchronously
+    And Recipient receives no async message back
 
   Scenario: Recipient sends and receives trusted ping message with return_route "none"
     When Recipient sends trusted ping message to mediator with return_route "none"
     Then Recipient receives trusted ping message back asynchronously
+    And Recipient receives no sync message back
