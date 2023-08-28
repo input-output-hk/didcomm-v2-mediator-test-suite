@@ -33,11 +33,7 @@ The configuration file is placed at `src/test/resources/mediator.conf`:
 
 ```text
 mediator {
-    url = "http://localhost:8080"
-    url = ${?MEDIATOR_URL}
     did = ${?MEDIATOR_DID}
-    invitation_endpoint = "/invitation"
-    invitation_endpoint = ${?INVITATION_ENDPOINT}
 }
 
 recipient {
@@ -53,9 +49,7 @@ Some things to consider:
 1. `recipient.host` is set to `host.docker.internal` by default to allow running tests VS the Docker containers.
 You could change this to `localhost` if you're working with the mediator and recipient available at the host network.
 2. `recipient.port` is set to `9999` by default to avoid conflicts with other services running on the host machine.
-3. `mediator.url` is set to `http://localhost:8080` by default, please, change it to the actual mediator URL.
-4. `mediator.did` is optional parameter. If not set, then the test suite will try to use `mediator.invitation_endpoint`
-to set to `mediator.did` if it is not explicitly set.
+3. `mediator.did` is mandatory parameter. Please, set it to the actual mediator DID and make sure its service endpoint is correctly set inside Peer DID services.
 
 ## Tools
 

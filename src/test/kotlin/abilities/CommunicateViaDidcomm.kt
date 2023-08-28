@@ -15,8 +15,9 @@ import org.didcommx.didcomm.protocols.routing.Routing
 import org.didcommx.didcomm.protocols.routing.WrapInForwardResult
 import org.didcommx.didcomm.secret.SecretResolver
 import org.didcommx.didcomm.utils.fromJsonToMap
+import org.didcommx.didcomm.utils.toJSONString
 
-open class CommunicateViaDidcomm(var mediatorPeerDid: String, serviceEndpoint: String = "") : Ability {
+open class CommunicateViaDidcomm(val mediatorPeerDid: String, serviceEndpoint: String = "") : Ability {
 
     private val didDocResolver = DIDDocResolverPeerDID()
     private val peerDidService = AgentPeerService.makeAgent(serviceEndpoint = serviceEndpoint)
@@ -32,6 +33,8 @@ open class CommunicateViaDidcomm(var mediatorPeerDid: String, serviceEndpoint: S
             return actor.abilityTo(CommunicateViaDidcomm::class.java)
         }
     }
+
+    fun getSecretsJson() = peerDidService.getSecrets().toJSONString()
 
     fun getDid(): String = peerDidService.did
 
@@ -64,5 +67,9 @@ open class CommunicateViaDidcomm(var mediatorPeerDid: String, serviceEndpoint: S
         val didcommMessage = unpackMessage(SerenityRest.lastResponse().asString(), secretResolver)
         Serenity.recordReportData().withTitle("DIDComm Response").andContents(didcommMessage.toString())
         return didcommMessage
+    }
+
+    override fun toString(): String {
+        return "Communicate via DIDComm with mediator $mediatorPeerDid"
     }
 }
