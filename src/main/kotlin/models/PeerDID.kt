@@ -25,7 +25,7 @@ class PeerDID(
     val didDocument: String
         get() = org.didcommx.peerdid.resolvePeerDID(did, VerificationMaterialFormatPeerDID.JWK)
 
-    fun getSecretResolverInMemory(): SecretResolverInMemory {
+    fun getSecrets(): Map<String, Secret> {
         fun validateRawKeyLength(key: ByteArray) {
             // for all supported key types now (ED25519 and X25510) the expected size is 32
             if (key.size != 32) {
@@ -62,12 +62,14 @@ class PeerDID(
             VerificationMaterial(VerificationMaterialFormat.JWK, this.jwkForKeyAuthentication.first().toJSONString())
         )
 
-        return SecretResolverInMemory(
-            mapOf(
-                "${this.did}#$keyIdAgreement" to secretKeyAgreement,
-                "${this.did}#$keyIdAuthentication" to secretKeyAuthentication
-            )
+        return mapOf(
+            "${this.did}#$keyIdAgreement" to secretKeyAgreement,
+            "${this.did}#$keyIdAuthentication" to secretKeyAuthentication
         )
+    }
+
+    fun getSecretResolverInMemory(): SecretResolverInMemory {
+        return SecretResolverInMemory(getSecrets())
     }
 
     fun getDidDocResolverInMemory(): DIDDocResolver {

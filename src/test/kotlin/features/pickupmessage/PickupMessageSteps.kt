@@ -13,9 +13,13 @@ import kotlinx.serialization.MissingFieldException
 import kotlinx.serialization.json.Json
 import models.MessagePickupStatusBody
 import models.PeerDID
+import net.serenitybdd.rest.SerenityRest
 import net.serenitybdd.screenplay.Actor
+import net.serenitybdd.screenplay.rest.questions.ResponseConsequence
+import org.apache.http.HttpStatus.SC_OK
 import org.didcommx.didcomm.message.Attachment
 import org.didcommx.didcomm.message.Message
+import org.didcommx.didcomm.protocols.routing.ForwardMessage
 import org.didcommx.didcomm.utils.idGeneratorDefault
 import org.didcommx.didcomm.utils.toJSONString
 import java.util.*
@@ -39,6 +43,19 @@ class PickupMessageSteps {
             SendEncryptedDidcommMessage(wrapInForwardResult.msgEncrypted.packedMessage)
         )
 
+        sender.should(
+            ResponseConsequence.seeThatResponse {
+                it.statusCode(SC_OK)
+            }
+        )
+        sender.attemptsTo(
+            Ensure.that(SerenityRest.lastResponse().statusCode).isEqualTo(SC_OK)
+                .withReportedError("Response status code for POSTing forward message must be $SC_OK!"),
+            Ensure.that(SerenityRest.lastResponse().body.prettyPrint()).isEqualTo("")
+                .withReportedError("Response body for POSTing forward message must be empty!")
+        )
+
+        sender.remember("forwardMessage", wrapInForwardResult.msg)
         sender.remember("initialMessage", basicMessage)
     }
 
@@ -80,7 +97,7 @@ class PickupMessageSteps {
             id = idGeneratorDefault(),
             body = mapOf(
                 "recipient_did" to recipient.recall<PeerDID>("communicationPeerDidService").did,
-                "limit" to 3
+                "limit" to 1
             ),
             type = DidcommMessageTypes.PICKUP_DELIVERY_REQUEST
         )
@@ -92,20 +109,51 @@ class PickupMessageSteps {
     @Then("Mediator delivers message of {actor} to {actor}")
     fun mediatorDeliversMessageOfSenderToRecipient(sender: Actor, recipient: Actor) {
         val didcommResponse = recipient.usingAbilityTo(CommunicateViaDidcomm::class.java).unpackLastDidcommMessage()
-        val encryptedMessage = didcommResponse.attachments!!.first().data as Attachment.Data.Base64
-        val decryptedMessage = Base64.getUrlDecoder().decode(encryptedMessage.base64).decodeToString()
+
+        recipient.attemptsTo(
+            Ensure.that(didcommResponse.attachments!!.size).isEqualTo(1)
+        )
+
+        val encryptedMessageSent = sender.recall<ForwardMessage>("forwardMessage").message.attachments!!.first().data as Attachment.Data.Json
+
+        val attachment: Attachment = didcommResponse.attachments!!.findLast { attachment ->
+            if (attachment.data.toJSONObject().keys.contains("json")) {
+                val data: Attachment.Data.Json = attachment.data as Attachment.Data.Json
+                data.json!!.toJSONString() == encryptedMessageSent.json!!.toJSONString()
+            } else if (attachment.data.toJSONObject().keys.contains("base64")) {
+                val data: Attachment.Data.Base64 = attachment.data as Attachment.Data.Base64
+                Base64.getUrlDecoder().decode(data.base64).decodeToString() == encryptedMessageSent.json!!.toJSONString()
+            } else {
+                throw Exception("Delivery Message attachment format is not JSON or Base64!")
+            }
+        } ?: throw Exception("Sender's attachment is not found in the delivery message! The message was not delivered.")
+
+        val message: String = if (attachment.data.toJSONObject().keys.contains("json")) {
+            val data: Attachment.Data.Json = attachment.data as Attachment.Data.Json
+            data.json!!.toString()
+        } else if (attachment.data.toJSONObject().keys.contains("base64")) {
+            val data: Attachment.Data.Base64 = attachment.data as Attachment.Data.Base64
+            Base64.getUrlDecoder().decode(data.base64).decodeToString()
+        } else {
+            throw Exception("Delivery Message attachment format is not JSON or Base64!")
+        }
+
         val achievedMessage = recipient.usingAbilityTo(CommunicateViaDidcomm::class.java).unpackMessage(
-            decryptedMessage,
+            message,
             recipient.recall<PeerDID>("communicationPeerDidService").getSecretResolverInMemory()
         )
         val initialMessage = sender.recall<Message>("initialMessage")
         recipient.attemptsTo(
-            Ensure.that(didcommResponse.type).isEqualTo(DidcommMessageTypes.PICKUP_DELIVERY),
-            Ensure.that(didcommResponse.attachments!!.size).isEqualTo(1),
-            Ensure.that(achievedMessage.id).isEqualTo(initialMessage.id),
-            Ensure.that(achievedMessage.body.toJSONString()).isEqualTo(initialMessage.body.toJSONString()),
-            Ensure.that(achievedMessage.from.toString()).isEqualTo(initialMessage.from.toString()),
+            Ensure.that(didcommResponse.type + "1").isEqualTo(DidcommMessageTypes.PICKUP_DELIVERY)
+                .withReportedError("Response type for delivery request MUST be delivery!"),
+            Ensure.that(achievedMessage.id).isEqualTo(initialMessage.id)
+                .withReportedError("Sender message ID has been changed!"),
+            Ensure.that(achievedMessage.body.toJSONString()).isEqualTo(initialMessage.body.toJSONString())
+                .withReportedError("Sender message body has been changed!"),
+            Ensure.that(achievedMessage.from.toString()).isEqualTo(initialMessage.from.toString())
+                .withReportedError("Sender message 'from' has been changed!"),
             Ensure.that(achievedMessage.to!!.first()).isEqualTo(initialMessage.to!!.first())
+                .withReportedError("Sender message 'to' has been changed!")
         )
         recipient.remember("deliveryThid", didcommResponse.thid!!)
         recipient.remember("attachmentId", didcommResponse.attachments!!.first().id)
