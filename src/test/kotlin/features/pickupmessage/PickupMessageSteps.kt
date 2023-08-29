@@ -144,7 +144,7 @@ class PickupMessageSteps {
         )
         val initialMessage = sender.recall<Message>("initialMessage")
         recipient.attemptsTo(
-            Ensure.that(didcommResponse.type + "1").isEqualTo(DidcommMessageTypes.PICKUP_DELIVERY)
+            Ensure.that(didcommResponse.type).isEqualTo(DidcommMessageTypes.PICKUP_DELIVERY)
                 .withReportedError("Response type for delivery request MUST be delivery!"),
             Ensure.that(achievedMessage.id).isEqualTo(initialMessage.id)
                 .withReportedError("Sender message ID has been changed!"),
