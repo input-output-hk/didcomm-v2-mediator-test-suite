@@ -41,8 +41,10 @@ class PingProtocolSteps {
     @Then("{actor} receives trusted ping message back asynchronously")
     fun recipientGetTrustedPingMessageBackAsynchronously(recipient: Actor) {
         val didCommResponse = recipient.usingAbilityTo(ListenToHttpMessages::class.java).receivedResponse()
-            ?: throw Exception("No async response received from mediator! " +
-                    "There could be a problem with the mediator or a listener port can be not available.")
+            ?: throw Exception(
+                "No async response received from mediator! " +
+                    "There could be a problem with the mediator or a listener port can be not available."
+            )
         val didCommResponseMessage = recipient.usingAbilityTo(CommunicateViaDidcomm::class.java).unpackMessage(didCommResponse)
         recipient.attemptsTo(
             Ensure.that(SerenityRest.lastResponse().statusCode).isEqualTo(SC_OK),
