@@ -22,6 +22,7 @@ The following mediators are compatible with DIDComm V2 and tested with this test
 |---------------------------------------------------------------------------|--------------------|---------------------------|--------------------|
 | [PRISM Mediator](https://github.com/input-output-hk/atala-prism-mediator) | :white_check_mark: | :white_check_mark:        | :white_check_mark: |
 | [RootsID Mediator](https://github.com/roots-id/didcomm-mediator)          | :white_check_mark: | :white_check_mark:        | :white_check_mark: |
+| [Blocktrust Mediator](https://github.com/bsandmann/blocktrust.Mediator)   | :white_check_mark: | :white_check_mark:        | :white_check_mark: |
 
 > If you want to add your mediator to the list, please, create a PR with the updated table.
 
