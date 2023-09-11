@@ -18,13 +18,17 @@ For the full list of scenarios and their description, please, refer to [features
 ## Compatible mediators
 
 The following mediators are compatible with DIDComm V2 and tested with this test suite:
-| Mediator                                                                  | Trust ping         | Mediator coordination 2.0 | Pickup 3.0         |
-|---------------------------------------------------------------------------|--------------------|---------------------------|--------------------|
-| [PRISM Mediator](https://github.com/input-output-hk/atala-prism-mediator) | :white_check_mark: | :white_check_mark:        | :white_check_mark: |
-| [RootsID Mediator](https://github.com/roots-id/didcomm-mediator)          | :white_check_mark: | :white_check_mark:        | :white_check_mark: |
-| [Blocktrust Mediator](https://github.com/bsandmann/blocktrust.Mediator)   | :white_check_mark: | :white_check_mark:        | :white_check_mark: |
+| Mediator                 |Trust ping (optional)| Mediator coordination 2.0 | Pickup 3.0         |
+|--------------------------|--------------------|---------------------------|--------------------|
+| [PRISM Mediator][1]      | :white_check_mark: | :white_check_mark:        | :white_check_mark: |
+| [RootsID Mediator][2]    | `*` | `*` | `*` |
+| [Blocktrust Mediator][3] | `*` | `*` | `*` |
+
+- `*` - All test are passing on the previous version of this test suite but not on the latest one.
 
 > If you want to add your mediator to the list, please, create a PR with the updated table.
+
+[**See the full list of report summaries**](Reports.md)
 
 ## Configuration
 
@@ -143,3 +147,8 @@ Please, refer to [CONTRIBUTING.md](./CONTRIBUTING.md) file.
 ## License
 
 This project is licensed under the terms of the [Apache License 2.0](./LICENSE).
+
+
+[1]: https://github.com/input-output-hk/atala-prism-mediator
+[2]: https://github.com/roots-id/didcomm-mediator
+[3]: https://github.com/bsandmann/blocktrust.Mediator
