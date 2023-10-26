@@ -12,7 +12,6 @@ import net.serenitybdd.screenplay.Actor
 import org.apache.http.HttpStatus.SC_OK
 import org.didcommx.didcomm.message.Message
 import org.didcommx.didcomm.utils.idGeneratorDefault
-import java.util.*
 
 class PingProtocolSteps {
     @When("{actor} sends trusted ping message to mediator with return_route {string}")
