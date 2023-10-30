@@ -2,7 +2,7 @@ plugins {
     id("org.jetbrains.kotlin.jvm") version "1.9.0"
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.0"
     idea
-    id("net.serenity-bdd.serenity-gradle-plugin") version "3.9.8"
+    id("net.serenity-bdd.serenity-gradle-plugin") version "4.0.14"
     id("org.jlleitschuh.gradle.ktlint") version "11.5.0"
 }
 
@@ -22,10 +22,10 @@ dependencies {
     implementation("org.slf4j:slf4j-log4j12:2.0.5")
     // Test engines and reports
     testImplementation("junit:junit:4.13.2")
-    implementation("net.serenity-bdd:serenity-core:3.9.8")
-    implementation("net.serenity-bdd:serenity-cucumber:3.9.8")
-    implementation("net.serenity-bdd:serenity-screenplay-rest:3.9.8")
-    testImplementation("net.serenity-bdd:serenity-ensure:3.9.8")
+    implementation("net.serenity-bdd:serenity-core:4.0.14")
+    implementation("net.serenity-bdd:serenity-cucumber:4.0.14")
+    implementation("net.serenity-bdd:serenity-screenplay-rest:4.0.14")
+    testImplementation("net.serenity-bdd:serenity-ensure:4.0.14")
     // DIDComm
     implementation("org.didcommx:didcomm:0.3.0")
     implementation("org.didcommx:peerdid:0.3.0")
@@ -41,8 +41,8 @@ dependencies {
 
 buildscript {
     dependencies {
-        classpath("net.serenity-bdd:serenity-single-page-report:3.9.8")
-        classpath("net.serenity-bdd:serenity-json-summary-report:3.9.8")
+        classpath("net.serenity-bdd:serenity-single-page-report:4.0.14")
+        classpath("net.serenity-bdd:serenity-json-summary-report:4.0.14")
     }
 }
 

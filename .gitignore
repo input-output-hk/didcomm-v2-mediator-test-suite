@@ -23,3 +23,7 @@ gradle-app.setting
 target/
 
 .idea/
+
+.metals/
+
+.vscode/

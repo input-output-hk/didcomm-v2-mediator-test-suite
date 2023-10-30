@@ -1,5 +1,6 @@
 package abilities
 
+import com.nimbusds.jose.util.JSONObjectUtils
 import models.AgentPeerService
 import models.DIDDocResolverPeerDID
 import models.PeerDID
@@ -16,6 +17,7 @@ import org.didcommx.didcomm.protocols.routing.WrapInForwardResult
 import org.didcommx.didcomm.secret.SecretResolver
 import org.didcommx.didcomm.utils.fromJsonToMap
 import org.didcommx.didcomm.utils.toJSONString
+import java.util.*
 
 open class CommunicateViaDidcomm(val mediatorPeerDid: String, serviceEndpoint: String = "") : Ability {
 
@@ -67,6 +69,12 @@ open class CommunicateViaDidcomm(val mediatorPeerDid: String, serviceEndpoint: S
         val didcommMessage = unpackMessage(SerenityRest.lastResponse().asString(), secretResolver)
         Serenity.recordReportData().withTitle("DIDComm Response").andContents(didcommMessage.toString())
         return didcommMessage
+    }
+
+    fun unpackLastSignedDidcommMessagePayload(): Message {
+        val didcommMessage = SerenityRest.lastResponse().body.jsonPath().getString("payload")
+        val decodedPayload = Base64.getUrlDecoder().decode(didcommMessage).decodeToString()
+        return Message.parse(JSONObjectUtils.parse(decodedPayload))
     }
 
     override fun toString(): String {

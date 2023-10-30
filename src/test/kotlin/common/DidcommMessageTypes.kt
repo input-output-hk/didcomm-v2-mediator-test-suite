@@ -16,4 +16,5 @@ object DidcommMessageTypes {
     const val PICKUP_DELIVERY = "https://didcomm.org/messagepickup/3.0/delivery"
     const val PICKUP_MESSAGES_RECEIVED = "https://didcomm.org/messagepickup/3.0/messages-received"
     const val PICKUP_STATUS = "https://didcomm.org/messagepickup/3.0/status"
+    const val PROBLEM_REPORT = "https://didcomm.org/report-problem/2.0/problem-report"
 }
