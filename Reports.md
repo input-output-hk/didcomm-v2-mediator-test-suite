@@ -5,7 +5,7 @@
 
 | Mediator                |    Data    |DID | Report Summary |
 |-------------------------|------------|----|--------|
-|[PRISM Mediator][1]      | 2023-09-11 |[^1]| [Report](reports/PRISM-Mediator-2023-09-11-v0.9.2-summary) |
+|[PRISM Mediator][1]      | 2023-09-11 |[^1]| [Report](reports/PRISM-Mediator-2023-09-11-v0.9.2-summary.html) |
 |[RootsID Mediator][2]    | 2023-09-11 |[^2]| [Report](reports/RootsID-Mediator-2023-09-11-summary.html) |
 |[Blocktrust Mediator][3] | 2023-09-11 |[^3]| [Report](reports/Blocktrust-Mediator-2023-09-11-summary.html) |
 
