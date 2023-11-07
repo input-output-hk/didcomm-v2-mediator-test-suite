@@ -1,13 +1,14 @@
 package features.pickupmessage
 
 import abilities.CommunicateViaDidcomm
-import common.*
+import common.DidcommMessageTypes
+import common.Ensure
 import interactions.SendDidcommMessage
 import interactions.SendEncryptedDidcommMessage
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
-import io.ktor.http.*
+import io.restassured.internal.http.Status
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.MissingFieldException
 import kotlinx.serialization.json.Json
@@ -15,8 +16,6 @@ import models.MessagePickupStatusBody
 import models.PeerDID
 import net.serenitybdd.rest.SerenityRest
 import net.serenitybdd.screenplay.Actor
-import net.serenitybdd.screenplay.rest.questions.ResponseConsequence
-import org.apache.http.HttpStatus.SC_OK
 import org.didcommx.didcomm.message.Attachment
 import org.didcommx.didcomm.message.Message
 import org.didcommx.didcomm.protocols.routing.ForwardMessage
@@ -43,14 +42,8 @@ class PickupMessageSteps {
             SendEncryptedDidcommMessage(wrapInForwardResult.msgEncrypted.packedMessage)
         )
 
-        sender.should(
-            ResponseConsequence.seeThatResponse {
-                it.statusCode(SC_OK)
-            }
-        )
         sender.attemptsTo(
-            Ensure.that(SerenityRest.lastResponse().statusCode).isEqualTo(SC_OK)
-                .withReportedError("Response status code for POSTing forward message must be $SC_OK!"),
+            Ensure.that(Status.SUCCESS.matches(SerenityRest.lastResponse().statusCode)).isTrue(),
             Ensure.that(SerenityRest.lastResponse().body.prettyPrint()).isEqualTo("")
                 .withReportedError("Response body for POSTing forward message must be empty!")
         )

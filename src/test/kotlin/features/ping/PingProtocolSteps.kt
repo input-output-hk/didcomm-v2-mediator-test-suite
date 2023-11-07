@@ -7,9 +7,9 @@ import common.Ensure
 import interactions.SendDidcommMessage
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
+import io.restassured.internal.http.Status
 import net.serenitybdd.rest.SerenityRest
 import net.serenitybdd.screenplay.Actor
-import org.apache.http.HttpStatus.SC_OK
 import org.didcommx.didcomm.message.Message
 import org.didcommx.didcomm.utils.idGeneratorDefault
 
@@ -31,7 +31,7 @@ class PingProtocolSteps {
     fun recipientGetTrustedPingMessageBackSynchronously(recipient: Actor) {
         val syncResponse = recipient.usingAbilityTo(CommunicateViaDidcomm::class.java).unpackLastDidcommMessage()
         recipient.attemptsTo(
-            Ensure.that(SerenityRest.lastResponse().statusCode).isEqualTo(SC_OK),
+            Ensure.that(Status.SUCCESS.matches(SerenityRest.lastResponse().statusCode)).isTrue(),
             Ensure.that(syncResponse.type).isEqualTo(DidcommMessageTypes.PING_RESPONSE),
             Ensure.that(syncResponse.to!!.first()).isEqualTo(recipient.recall("peerDid"))
         )
@@ -46,7 +46,7 @@ class PingProtocolSteps {
             )
         val didCommResponseMessage = recipient.usingAbilityTo(CommunicateViaDidcomm::class.java).unpackMessage(didCommResponse)
         recipient.attemptsTo(
-            Ensure.that(SerenityRest.lastResponse().statusCode).isEqualTo(SC_OK),
+            Ensure.that(Status.SUCCESS.matches(SerenityRest.lastResponse().statusCode)).isTrue(),
             Ensure.that(didCommResponseMessage.type).isEqualTo(DidcommMessageTypes.PING_RESPONSE),
             Ensure.that(didCommResponseMessage.to!!.first()).isEqualTo(recipient.recall("peerDid"))
         )
