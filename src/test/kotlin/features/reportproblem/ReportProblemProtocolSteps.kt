@@ -38,7 +38,7 @@ class ReportProblemProtocolSteps {
         val reportProblemMessage = recipient.usingAbilityTo(CommunicateViaDidcomm::class.java).unpackLastDidcommMessage()
         recipient.attemptsTo(
             Ensure.that(reportProblemMessage.type).isEqualTo(DidcommMessageTypes.PROBLEM_REPORT),
-            Ensure.that(reportProblemMessage.body["code"] as String).isEqualTo(ReportProblemErrors.STORAGE)
+            Ensure.that(reportProblemMessage.body["code"] as String).isEqualTo(ReportProblemErrors.DEJAVU)
         )
     }
 
