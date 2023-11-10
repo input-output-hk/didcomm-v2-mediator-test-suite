@@ -20,12 +20,11 @@ Feature: Report Problem Protocol
     When Recipient sends forward message to a DID that is not enrolled
     Then Recipient gets signed report problem message with not enrolled message problem code
 
+  Scenario: Sending malformed message
+    When Recipient sends a plaintext message with malformed payload
+    Then Recipient gets report problem message with malformed payload problem code
+
   # Fails for now, error 400 and empty body
 #  Scenario: Sending tampered message
 #    When Recipient sends a message with tampered payload
 #    Then Recipient gets report problem message with crypto error problem code
-
-  # Fails for now, error 400 and empty body
-#  Scenario: Sending malformed message
-#    When Recipient sends a plaintext message with malformed payload
-#    Then Recipient gets report problem message with malformed payload problem code
