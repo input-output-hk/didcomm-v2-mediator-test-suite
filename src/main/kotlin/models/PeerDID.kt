@@ -23,7 +23,7 @@ class PeerDID(
     val jwkForKeyAuthentication: List<OctetKeyPair>
 ) {
     val didDocument: String
-        get() = org.didcommx.peerdid.resolvePeerDID(did, VerificationMaterialFormatPeerDID.JWK)
+        get() = PeerDidResolverLocal.resolvePeerDID(did, VerificationMaterialFormatPeerDID.JWK)
 
     fun getSecrets(): Map<String, Secret> {
         fun validateRawKeyLength(key: ByteArray) {
