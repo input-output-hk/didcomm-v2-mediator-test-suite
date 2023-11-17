@@ -11,13 +11,12 @@ import org.didcommx.didcomm.utils.toJson
 import org.didcommx.peerdid.DIDCommServicePeerDID
 import org.didcommx.peerdid.DIDDocPeerDID
 import org.didcommx.peerdid.VerificationMaterialFormatPeerDID
-import org.didcommx.peerdid.resolvePeerDID
 import java.util.*
 
 class DIDDocResolverPeerDID : DIDDocResolver {
 
     override fun resolve(did: String): Optional<DIDDoc> {
-        val didDocJson = resolvePeerDID(did, format = VerificationMaterialFormatPeerDID.JWK)
+        val didDocJson = PeerDidResolverLocal.resolvePeerDID(did, format = VerificationMaterialFormatPeerDID.JWK)
         val didDoc = DIDDocPeerDID.fromJson(didDocJson)
         return Optional.ofNullable(
             DIDDoc(
