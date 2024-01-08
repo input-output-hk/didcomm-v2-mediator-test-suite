@@ -10,9 +10,9 @@ object PeerDidResolverLocal {
     fun isPeerDID(peerDID: String): Boolean {
         val regex =
             (
-                "^did:peer:(([0](z)([1-9a-km-zA-HJ-NP-Z]{46,47}))" +
-                    "|(2((.[AEVID](z)([1-9a-km-zA-HJ-NP-Z]{46,47}))+(.(S)[0-9a-zA-Z=]*)*)))$"
-                ).toRegex()
+                    "^did:peer:(([0](z)([1-9a-km-zA-HJ-NP-Z]{46,47}))" +
+                            "|(2((.[AEVID](z)([1-9a-km-zA-HJ-NP-Z]{46,47}))+(.(S)[0-9a-zA-Z=]*)*)))$"
+                    ).toRegex()
         return regex.matches(peerDID)
     }
 
@@ -36,7 +36,7 @@ object PeerDidResolverLocal {
         val decodedEncumbasis = decodeMultibaseEncnumbasisAuth(inceptionKey, format)
         return DIDDocPeerDID(
             did = peerDID,
-            authentication = listOf(getVerificationMethod(peerDID, decodedEncumbasis))
+            authentication = listOf(getVerificationMethod(1, peerDID, decodedEncumbasis))
         )
     }
 
@@ -46,9 +46,9 @@ object PeerDidResolverLocal {
         val authentications = mutableListOf<VerificationMethodPeerDID>()
         val keyAgreement = mutableListOf<VerificationMethodPeerDID>()
 
-        keys.split(".").forEach {
-            val prefix = it[0]
-            val value = it.drop(1)
+        keys.split(".").withIndex().forEach { (index , key) ->
+            val prefix = key[0]
+            val value = key.drop(1)
 
             when (prefix) {
                 Numalgo2Prefix.SERVICE.prefix -> {
@@ -57,12 +57,12 @@ object PeerDidResolverLocal {
 
                 Numalgo2Prefix.AUTHENTICATION.prefix -> {
                     val decodedEncumbasis = decodeMultibaseEncnumbasisAuth(value, format)
-                    authentications.add(getVerificationMethod(peerDID, decodedEncumbasis))
+                    authentications.add(getVerificationMethod(index + 1, peerDID, decodedEncumbasis))
                 }
 
                 Numalgo2Prefix.KEY_AGREEMENT.prefix -> {
                     val decodedEncumbasis = decodeMultibaseEncnumbasisAgreement(value, format)
-                    keyAgreement.add(getVerificationMethod(peerDID, decodedEncumbasis))
+                    keyAgreement.add(getVerificationMethod(index + 1, peerDID, decodedEncumbasis))
                 }
 
                 else -> throw IllegalArgumentException("Unsupported transform part of PeerDID: $prefix")
@@ -111,9 +111,9 @@ object PeerDidResolverLocal {
         }
     }
 
-    private fun getVerificationMethod(did: String, decodedEncumbasis: DecodedEncumbasis) =
+    private fun getVerificationMethod(keyId:Int , did: String, decodedEncumbasis: DecodedEncumbasis) =
         VerificationMethodPeerDID(
-            id = "$did#${decodedEncumbasis.encnumbasis}",
+            id = "$did#key-$keyId",
             controller = did,
             verMaterial = decodedEncumbasis.verMaterial
         )
@@ -240,15 +240,19 @@ object PeerDidResolverLocal {
             val serviceType = serviceMap.getValue(ServicePrefix.getValue(SERVICE_TYPE)).toString()
                 .replace(ServicePrefix.getValue(SERVICE_DIDCOMM_MESSAGING), SERVICE_DIDCOMM_MESSAGING)
 
+            val serviceId = if (serviceMapList.size > 1) {
+                if (index == 0) "#service" else "#service-${index}"
+            } else "#service"
+
+            val serviceEndpointMap = mutableMapOf<String, Any>()
+            serviceMap[ServicePrefix.getValue(SERVICE_ENDPOINT)]?.let { serviceEndpointMap.put("uri", it) }
+            serviceMap[ServicePrefix.getValue(SERVICE_ROUTING_KEYS)]?.let { serviceEndpointMap.put("routingKeys", it) }
+            serviceMap[ServicePrefix.getValue(SERVICE_ACCEPT)]?.let { serviceEndpointMap.put("accept", it) }
             val service = mutableMapOf<String, Any>(
-                "id" to "$peerDID#${serviceType.lowercase()}-$index",
-                "type" to serviceType
+                "id" to serviceId,
+                "type" to serviceType,
+                "serviceEndpoint" to serviceEndpointMap
             )
-
-            serviceMap[ServicePrefix.getValue(SERVICE_ENDPOINT)]?.let { service.put(SERVICE_ENDPOINT, it) }
-            serviceMap[ServicePrefix.getValue(SERVICE_ROUTING_KEYS)]?.let { service.put(SERVICE_ROUTING_KEYS, it) }
-            serviceMap[ServicePrefix.getValue(SERVICE_ACCEPT)]?.let { service.put(SERVICE_ACCEPT, it) }
-
             OtherService(service)
         }
 
