@@ -7,6 +7,8 @@ import org.didcommx.peerdid.core.*
 
 object PeerDidResolverLocal {
 
+    const val SERVICE_URI = "uri"
+
     fun isPeerDID(peerDID: String): Boolean {
         val regex =
             (
@@ -245,9 +247,23 @@ object PeerDidResolverLocal {
             } else "#service"
 
             val serviceEndpointMap = mutableMapOf<String, Any>()
-            serviceMap[ServicePrefix.getValue(SERVICE_ENDPOINT)]?.let { serviceEndpointMap.put("uri", it) }
-            serviceMap[ServicePrefix.getValue(SERVICE_ROUTING_KEYS)]?.let { serviceEndpointMap.put("routingKeys", it) }
-            serviceMap[ServicePrefix.getValue(SERVICE_ACCEPT)]?.let { serviceEndpointMap.put("accept", it) }
+            val serviceEndpointValue = serviceMap[ServicePrefix.getValue(SERVICE_ENDPOINT)]
+            when (serviceEndpointValue) {
+                is String -> {
+                    serviceMap[ServicePrefix.getValue(SERVICE_ENDPOINT)]?.let { serviceEndpointMap.put(SERVICE_URI, it) }
+                    serviceMap[ServicePrefix.getValue(SERVICE_ROUTING_KEYS)]?.let { serviceEndpointMap.put(SERVICE_ROUTING_KEYS, it) }
+                    serviceMap[ServicePrefix.getValue(SERVICE_ACCEPT)]?.let { serviceEndpointMap.put(SERVICE_ACCEPT, it) }
+                }
+                is Map<*, *> -> {
+                    val serviceEndpointValueAsMap = serviceEndpointValue as Map<*, *>
+                    serviceEndpointValueAsMap[ServicePrefix.getValue(SERVICE_URI)]?.let { serviceEndpointMap.put(SERVICE_URI, it) }
+                    serviceEndpointValueAsMap[ServicePrefix.getValue(SERVICE_ROUTING_KEYS)]?.let { serviceEndpointMap.put(SERVICE_ROUTING_KEYS, it) }
+                    serviceEndpointValueAsMap[ServicePrefix.getValue(SERVICE_ACCEPT)]?.let { serviceEndpointMap.put(SERVICE_ACCEPT, it) }
+                }
+                else -> {
+                    throw IllegalArgumentException("Service doesn't contain a valid Endpoint")
+                }
+            }
             val service = mutableMapOf<String, Any>(
                 "id" to serviceId,
                 "type" to serviceType,
@@ -264,6 +280,7 @@ object PeerDidResolverLocal {
         SERVICE_ENDPOINT to "s",
         SERVICE_DIDCOMM_MESSAGING to "dm",
         SERVICE_ROUTING_KEYS to "r",
-        SERVICE_ACCEPT to "a"
+        SERVICE_ACCEPT to "a",
+        SERVICE_URI to "uri"
     )
 }
