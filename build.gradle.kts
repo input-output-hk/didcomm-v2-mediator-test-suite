@@ -28,7 +28,7 @@ dependencies {
     testImplementation("net.serenity-bdd:serenity-ensure:4.0.14")
     // DIDComm
     implementation("org.didcommx:didcomm:0.3.0")
-    implementation("org.didcommx:peerdid:0.3.0")
+    implementation("org.didcommx:peerdid:0.5.0")
     // Ktor for HTTP listener
     implementation("io.ktor:ktor-server-netty:2.3.3")
     implementation("io.ktor:ktor-client-apache:2.3.3")
