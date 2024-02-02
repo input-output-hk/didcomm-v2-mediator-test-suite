@@ -15,6 +15,9 @@ repositories {
     maven {
         url = uri("https://maven.pkg.jetbrains.space/public/p/kotlinx-coroutines/maven")
     }
+    maven { // jitpack.io  -> com.github.multiformats:java-multibase:v1.1.0
+        url = uri("https://jitpack.io")
+    }
 }
 
 dependencies {
