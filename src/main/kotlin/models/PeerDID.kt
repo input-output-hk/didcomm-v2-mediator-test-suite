@@ -16,6 +16,7 @@ import org.didcommx.peerdid.core.fromBase58Multibase
 import org.didcommx.peerdid.core.fromJwk
 import org.didcommx.peerdid.core.toBase58Multibase
 import org.didcommx.peerdid.core.toMulticodec
+import org.didcommx.peerdid.resolvePeerDID
 
 class PeerDID(
     val did: String,
@@ -23,7 +24,7 @@ class PeerDID(
     val jwkForKeyAuthentication: List<OctetKeyPair>
 ) {
     val didDocument: String
-        get() = PeerDidResolverLocal.resolvePeerDID(did, VerificationMaterialFormatPeerDID.JWK)
+        get() = resolvePeerDID(did, VerificationMaterialFormatPeerDID.JWK)
 
     fun getSecrets(): Map<String, Secret> {
         fun validateRawKeyLength(key: ByteArray) {

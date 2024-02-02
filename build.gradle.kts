@@ -15,6 +15,9 @@ repositories {
     maven {
         url = uri("https://maven.pkg.jetbrains.space/public/p/kotlinx-coroutines/maven")
     }
+    maven { // jitpack.io  -> com.github.multiformats:java-multibase:v1.1.0
+        url = uri("https://jitpack.io")
+    }
 }
 
 dependencies {
@@ -28,7 +31,7 @@ dependencies {
     testImplementation("net.serenity-bdd:serenity-ensure:4.0.14")
     // DIDComm
     implementation("org.didcommx:didcomm:0.3.0")
-    implementation("org.didcommx:peerdid:0.3.0")
+    implementation("org.didcommx:peerdid:0.5.0")
     // Ktor for HTTP listener
     implementation("io.ktor:ktor-server-netty:2.3.3")
     implementation("io.ktor:ktor-client-apache:2.3.3")
