@@ -27,3 +27,8 @@ target/
 .metals/
 
 .vscode/
+
+
+bin/
+reports/
+.bsp/
