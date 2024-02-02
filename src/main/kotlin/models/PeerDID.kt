@@ -18,7 +18,6 @@ import org.didcommx.peerdid.core.toBase58Multibase
 import org.didcommx.peerdid.core.toMulticodec
 import org.didcommx.peerdid.resolvePeerDID
 
-
 class PeerDID(
     val did: String,
     val jwkForKeyAgreement: List<OctetKeyPair>,

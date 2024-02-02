@@ -8,10 +8,10 @@ import org.didcommx.didcomm.diddoc.DIDDoc
 import org.didcommx.didcomm.diddoc.DIDDocResolver
 import org.didcommx.didcomm.diddoc.VerificationMethod
 import org.didcommx.didcomm.utils.toJson
-import org.didcommx.peerdid.resolvePeerDID
 import org.didcommx.peerdid.DIDCommServicePeerDID
 import org.didcommx.peerdid.DIDDocPeerDID
 import org.didcommx.peerdid.VerificationMaterialFormatPeerDID
+import org.didcommx.peerdid.resolvePeerDID
 import java.util.*
 
 class DIDDocResolverPeerDID : DIDDocResolver {
