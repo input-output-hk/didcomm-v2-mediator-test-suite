@@ -51,21 +51,32 @@ class PeerDID(
 
         val keyIdAgreement = createMultibaseEncnumbasis(keyAgreement).drop(1)
         val keyIdAuthentication = createMultibaseEncnumbasis(keyAuthentication).drop(1)
+        val keyIdAgreementIndex = this.did.indexOf(keyIdAgreement)
+        val keyIdAuthenticationIndex = this.did.indexOf(keyIdAuthentication)
+        val keyAgreementId: Int
+        val keyAuthenticationId: Int
+        if (keyIdAgreementIndex < keyIdAuthenticationIndex) {
+            keyAgreementId = 1
+            keyAuthenticationId = 2
+        } else {
+            keyAgreementId = 2
+            keyAuthenticationId = 1
+        }
 
         val secretKeyAgreement = Secret(
-            "${this.did}#$keyIdAgreement",
+            "${this.did}#key-$keyAgreementId",
             VerificationMethodType.JSON_WEB_KEY_2020,
             VerificationMaterial(VerificationMaterialFormat.JWK, this.jwkForKeyAgreement.first().toJSONString())
         )
         val secretKeyAuthentication = Secret(
-            "${this.did}#$keyIdAuthentication",
+            "${this.did}#key-$keyAuthenticationId",
             VerificationMethodType.JSON_WEB_KEY_2020,
             VerificationMaterial(VerificationMaterialFormat.JWK, this.jwkForKeyAuthentication.first().toJSONString())
         )
 
         return mapOf(
-            "${this.did}#$keyIdAgreement" to secretKeyAgreement,
-            "${this.did}#$keyIdAuthentication" to secretKeyAuthentication
+            "${this.did}#key-$keyAgreementId" to secretKeyAgreement,
+            "${this.did}#key-$keyAuthenticationId" to secretKeyAuthentication
         )
     }
 

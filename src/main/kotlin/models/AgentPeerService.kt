@@ -14,9 +14,11 @@ object AgentPeerService {
         return """
         {
             "type": "DIDCommMessaging",
-            "serviceEndpoint": "$serviceEndpoint",
-            "routingKeys": [],
-            "accept": ["didcomm/v2"]
+            "serviceEndpoint": {
+              "uri":"$serviceEndpoint",
+              "routingKeys": [],
+              "accept": ["didcomm/v2"]
+            }
         }
     """
     }
