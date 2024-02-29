@@ -1,7 +1,9 @@
 package features.mediatorcoordination
 
 import abilities.CommunicateViaDidcomm
-import common.*
+import common.DidcommMessageTypes
+import common.Ensure
+import common.TestConstants
 import interactions.SendDidcommMessage
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
@@ -11,7 +13,6 @@ import net.serenitybdd.screenplay.Actor
 import org.didcommx.didcomm.message.Message
 import org.didcommx.didcomm.utils.idGeneratorDefault
 import org.didcommx.didcomm.utils.toJSONString
-import java.util.*
 
 class MediationCoordinationSteps {
 

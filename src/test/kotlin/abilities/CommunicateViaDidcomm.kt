@@ -30,7 +30,6 @@ open class CommunicateViaDidcomm(val mediatorPeerDid: String, serviceEndpoint: S
         fun at(mediatorPeerDid: String, serviceEndpoint: String = ""): CommunicateViaDidcomm {
             return CommunicateViaDidcomm(mediatorPeerDid, serviceEndpoint)
         }
-
         fun `as`(actor: Actor): CommunicateViaDidcomm {
             return actor.abilityTo(CommunicateViaDidcomm::class.java)
         }
