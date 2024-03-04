@@ -35,6 +35,9 @@ dependencies {
     // Ktor for HTTP listener
     implementation("io.ktor:ktor-server-netty:2.3.3")
     implementation("io.ktor:ktor-client-apache:2.3.3")
+    implementation("io.ktor:ktor-client-websockets:2.3.3")
+    implementation("io.ktor:ktor-client-cio:2.3.3")
+
     // JSON serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
     // Hoplite for configuration
@@ -59,6 +62,7 @@ serenity {
 tasks.test {
     testLogging.showStandardStreams = true
     systemProperty("cucumber.filter.tags", System.getProperty("cucumber.filter.tags"))
+    dependsOn(tasks.ktlintFormat)
 }
 
 kotlin {

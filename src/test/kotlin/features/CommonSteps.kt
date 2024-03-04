@@ -1,5 +1,6 @@
 package features
 
+import abilities.CommunicateOverWebSocket
 import abilities.CommunicateViaDidcomm
 import abilities.ListenToHttpMessages
 import com.sksamuel.hoplite.ConfigLoader
@@ -22,17 +23,20 @@ class CommonSteps {
         val didResolver = DIDDocResolverPeerDID()
         val mediatorDidDoc = didResolver.resolve(env.mediator.did).get()
         val mediatorUrl = mediatorDidDoc.didCommServices.first().serviceEndpoint
+        val mediatorWSUrl = mediatorDidDoc.didCommServices[1].serviceEndpoint
 
         val cast = Cast()
         cast.actorNamed(
             "Recipient",
             CallAnApi.at(mediatorUrl),
+            CommunicateOverWebSocket.using(mediatorWSUrl),
             ListenToHttpMessages.at(env.recipient.host, env.recipient.port),
             CommunicateViaDidcomm.at(
                 env.mediator.did,
                 "http://${env.recipient.host}:${env.recipient.port}/"
             )
         )
+
         cast.actorNamed(
             "Sender",
             CallAnApi.at(mediatorUrl),

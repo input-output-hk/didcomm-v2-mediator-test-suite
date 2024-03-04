@@ -5,7 +5,6 @@ Feature: Pickup message protocol
 
   Not tested features of the protocol:
   * Multiple recipients - not supported
-  * Live mode - not supported
 
   Background: Recipient and Mediator successfully set up mediation
     Given Recipient sends a mediate request message to the mediator
