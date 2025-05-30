@@ -1,7 +1,7 @@
 package features.pickupmessage
 
 import abilities.CommunicateViaDidcomm
-import common.DidcommMessageTypes
+import models.DidcommMessageTypes
 import common.Ensure
 import interactions.SendDidcommMessage
 import interactions.SendEncryptedDidcommMessage

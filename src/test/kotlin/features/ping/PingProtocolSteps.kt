@@ -2,7 +2,7 @@ package features.ping
 
 import abilities.CommunicateViaDidcomm
 import abilities.ListenToHttpMessages
-import common.DidcommMessageTypes
+import models.DidcommMessageTypes
 import common.Ensure
 import interactions.SendDidcommMessage
 import io.cucumber.java.en.Then

@@ -1,7 +1,7 @@
 package features.reportproblem
 
 import abilities.CommunicateViaDidcomm
-import common.DidcommMessageTypes
+import models.DidcommMessageTypes
 import common.Ensure
 import common.ReportProblemErrors
 import interactions.SendDidcommMessage

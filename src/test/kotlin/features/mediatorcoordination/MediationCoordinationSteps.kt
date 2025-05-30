@@ -1,7 +1,7 @@
 package features.mediatorcoordination
 
 import abilities.CommunicateViaDidcomm
-import common.DidcommMessageTypes
+import models.DidcommMessageTypes
 import common.Ensure
 import common.TestConstants
 import interactions.SendDidcommMessage
@@ -187,7 +187,7 @@ class MediationCoordinationSteps {
     }
 
     @Then("Mediator responds to {actor} with a message with no_change status")
-    fun mediatorRespondsToRecipientWithAMessageWithNo_changeStatus(recipient: Actor) {
+    fun mediatorRespondsToRecipientWithAMessageWithNoChangeStatus(recipient: Actor) {
         val didcommResponse = recipient.usingAbilityTo(CommunicateViaDidcomm::class.java).unpackLastDidcommMessage()
         val mediationKeylistUpdateResponse = Json.decodeFromString<MediationKeylistUpdateResponse>(didcommResponse.body.toJSONString())
         recipient.attemptsTo(

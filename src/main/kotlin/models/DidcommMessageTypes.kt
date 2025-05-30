@@ -1,4 +1,4 @@
-package common
+package models
 
 object DidcommMessageTypes {
     const val PING_REQUEST = "https://didcomm.org/trust-ping/2.0/ping"

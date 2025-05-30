@@ -5,11 +5,13 @@ Test Suite for DIDCommV2-compatible Mediators
 ## What protocols are tested
 
 The following protocols are tested:
+
 * https://didcomm.org/trust-ping/2.0/
 * https://didcomm.org/mediator-coordination/2.0/
 * https://didcomm.org/pickup/3.0/
 
 What is not tested:
+
 * Multiple recipients for Pickup 3.0 are not supported
 * Live mode for Pickup 3.0 are not supported
 
@@ -18,6 +20,7 @@ For the full list of scenarios and their description, please, refer to [features
 ## Compatible mediators
 
 The following mediators are compatible with DIDComm V2 and tested with this test suite:
+
 | Mediator                                                                  | Trust ping         | Mediator coordination 2.0 | Pickup 3.0         |
 |---------------------------------------------------------------------------|--------------------|---------------------------|--------------------|
 | [PRISM Mediator](https://github.com/input-output-hk/atala-prism-mediator) | :white_check_mark: | :white_check_mark:        | :white_check_mark: |
@@ -48,9 +51,10 @@ recipient {
 Some things to consider:
 
 1. `recipient.host` is set to `host.docker.internal` by default to allow running tests VS the Docker containers.
-You could change this to `localhost` if you're working with the mediator and recipient available at the host network.
+   You could change this to `localhost` if you're working with the mediator and recipient available at the host network.
 2. `recipient.port` is set to `9999` by default to avoid conflicts with other services running on the host machine.
-3. `mediator.did` is mandatory parameter. Please, set it to the actual mediator DID and make sure its service endpoint is correctly set inside Peer DID services.
+3. `mediator.did` is mandatory parameter. Please, set it to the actual mediator DID and make sure its service endpoint
+   is correctly set inside Peer DID services.
 
 ## Tools
 
@@ -59,7 +63,6 @@ This project uses the following tools:
 1. [Serenity BDD](https://serenity-bdd.github.io/) for test execution engine
 2. [Hoplite](https://github.com/sksamuel/hoplite) for configuration management
 3. [Ktor](https://ktor.io/) for HTTP listener (async DIDComm messages receiver)
-
 
 ## Scenarios execution
 
@@ -90,6 +93,7 @@ To do so, execute the following command from the top-level directory:
 ```
 
 After the command is finished, you will see the following output:
+
 ```text
 > Task :reports
 Generating Additional Serenity Reports for didcomm-v2-mediator-test-suite to directory ~/didcomm-v2-mediator-test-suite/target/site/serenity
@@ -103,11 +107,13 @@ And summary reports themselves will be available in `./target/site/serenity` fol
 
 JUnit XML reports are also generated under `./target/site/serenity` folder with names `SERENITY-JUNIT-*.xml`.
 
-> For more information about the reports, please refer to [Serenity BDD reports documentation](https://serenity-bdd.github.io/docs/reporting/the_serenity_reports).
+> For more information about the reports, please refer
+> to [Serenity BDD reports documentation](https://serenity-bdd.github.io/docs/reporting/the_serenity_reports).
 
 ## GitHub Actions integration
 
 This project can be integrated in GitHub actions workflow with the following snippet:
+
 ```yaml
   # Checkout repository
   - name: Checkout

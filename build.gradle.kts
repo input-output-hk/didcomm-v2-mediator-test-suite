@@ -3,7 +3,8 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.0"
     idea
     id("net.serenity-bdd.serenity-gradle-plugin") version "4.0.14"
-    id("org.jlleitschuh.gradle.ktlint") version "11.5.0"
+    id("org.jlleitschuh.gradle.ktlint") version "12.3.0"
+    id("io.gatling.gradle") version "3.14.3"
 }
 
 group = "didcommv2.mediator.tests"
@@ -15,7 +16,8 @@ repositories {
     maven {
         url = uri("https://maven.pkg.jetbrains.space/public/p/kotlinx-coroutines/maven")
     }
-    maven { // jitpack.io  -> com.github.multiformats:java-multibase:v1.1.0
+    maven {
+        // jitpack.io  -> com.github.multiformats:java-multibase:v1.1.0
         url = uri("https://jitpack.io")
     }
 }
@@ -43,6 +45,14 @@ dependencies {
     // Hoplite for configuration
     implementation("com.sksamuel.hoplite:hoplite-core:2.7.4")
     implementation("com.sksamuel.hoplite:hoplite-hocon:2.7.4")
+
+    // gatling
+    gatling("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+    gatling("io.rest-assured:rest-assured:5.5.5")
+    gatling("org.didcommx:didcomm:0.3.0")
+    gatling("org.didcommx:peerdid:0.5.0")
+    gatling("io.ktor:ktor-client-cio:2.3.3")
+    gatling("io.ktor:ktor-server-netty:2.3.3")
 }
 
 buildscript {
@@ -66,9 +76,10 @@ tasks.test {
 }
 
 kotlin {
-    jvmToolchain(19)
+    jvmToolchain(17)
 }
 
 ktlint {
-    disabledRules.set(setOf("no-wildcard-imports"))
+    version.set("1.6.0")
+    verbose.set(true)
 }
